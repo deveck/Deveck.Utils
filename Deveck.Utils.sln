@@ -20,6 +20,9 @@ Global
 		{CBC63030-0EEE-445B-8724-AFFB0F8941F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBC63030-0EEE-445B-8724-AFFB0F8941F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Samples\Samples.csproj
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection

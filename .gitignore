@@ -1,5 +1,6 @@
-
+*.userprefs
 *.user
 *.suo
-/bin
-/obj
+*.pidb
+bin
+obj
