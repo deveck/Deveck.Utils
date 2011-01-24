@@ -11,6 +11,7 @@ namespace Deveck.Utils.Samples
 		
 		public static void Main(string[] args)
         {
+			
             Console.WriteLine(@"These samples show you how to use the SimpleFormatter from deveck.net");
             Console.WriteLine();
 
@@ -47,7 +48,6 @@ namespace Deveck.Utils.Samples
 					Console.Write(", ");
 				Console.Write(f.Format("{[universe]}"));
 			}
-			
             Console.ReadLine();
         }
 
