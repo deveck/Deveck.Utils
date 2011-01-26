@@ -36,6 +36,8 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringUtils\SimpleFormatter.cs" />
+    <Compile Include="Factory\ClassIdentifierAttribute.cs" />
+    <Compile Include="Factory\GenericClassIdentifierFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -46,4 +48,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Folder Include="Factory\" />
+  </ItemGroup>
 </Project>
