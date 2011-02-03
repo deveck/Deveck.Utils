@@ -1,8 +1,15 @@
+/**
+ * From http://www.codeproject.com/KB/system/rawinput.aspx
+ * thanks to smesser, Emma Burrows 
+ */
+
+
 using System;
 using System.Collections;
 using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
+using System.Windows.Forms;
 
 namespace Deveck.Utils.SimpleComm
 {

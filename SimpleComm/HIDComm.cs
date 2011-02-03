@@ -2,18 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
-using Wiffzack.Communication.RawInput;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+
 using Deveck.Utils.Factory;
+using System.Collections;
 
 namespace Deveck.Utils.SimpleComm
 {
     /// <summary>
-    /// SimpleComm PS2 (keyboard input) implementation
+    /// SimpleComm HID (Human Interface Device) (keyboard input) implementation
     /// </summary>
-    [ClassIdentifier("simplecomm/ps2")]
-    public class PS2Comm:NativeWindow, ICommunication
+    /// <remarks>
+    /// <para>Configuration:
+    /// No configuration values are needed
+    /// </para>
+    /// </remarks>
+    [ClassIdentifier("simplecomm/win/hid")]
+    public class HIDComm : NativeWindow, ICommunication
     {
         /// <summary>
         /// RawInput handler
@@ -45,7 +51,7 @@ namespace Deveck.Utils.SimpleComm
         private static extern int GetKeyboardState(byte[] pbKeyState);
 
 
-        public PS2Comm()
+        public HIDComm()
         {
             CreateParams cp = new CreateParams();
             this.CreateHandle(cp);
@@ -71,9 +77,8 @@ namespace Deveck.Utils.SimpleComm
         public event Action<ICommunication> OnConnectionClosed;
 #pragma warning restore 067
 
-        public void SetupCommunication(System.Xml.XmlElement setup)
-        {
-            
+        public void SetupCommunication(IDictionary setup)
+        {            
             _inputDevice = new InputDevice(this.Handle);
             _inputDevice.EnumerateDevices();
             _inputDevice.KeyDown += new InputDevice.DeviceEventHandler(InternalOnRawKeyPress);
@@ -103,7 +108,8 @@ namespace Deveck.Utils.SimpleComm
 
         private void InternalOnRawKeyPress(object sender, InputDevice.KeyControlEventArgs e)
         {
-            Debug.WriteLine("PRESS: " + ((Keys)e.Keyboard.key).ToString());
+            Debug.WriteLine(string.Format("PRESS[{0}]: {1}", e.Keyboard.deviceName,
+			                              ((Keys)e.Keyboard.key).ToString()));
 
             if ((Keys)e.Keyboard.key == Keys.Menu)
             {
@@ -172,7 +178,7 @@ namespace Deveck.Utils.SimpleComm
             foreach (Keys k in keys)
             {
                 byte[] translated = new byte[2];
-                int dllResult = ToAscii((int)k, 0, new byte[256], translated, 0);
+                /*int dllResult = */ToAscii((int)k, 0, new byte[256], translated, 0);
 
                 result += Encoding.ASCII.GetString(translated, 0, 1);
             }
@@ -186,7 +192,7 @@ namespace Deveck.Utils.SimpleComm
 
         public void SendData(byte[] data, int offset, int length)
         {
-            Console.WriteLine("PS2 Interface does not support sending data");
+			throw new NotSupportedException("HIDs do not support sending data");
         }
 
         #endregion

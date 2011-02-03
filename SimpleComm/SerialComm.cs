@@ -25,7 +25,7 @@ namespace Deveck.Utils.SimpleComm
     /// </list>
     /// </para>
     /// </remarks>
-    [ClassIdentifier("simplecomm/rs232")]
+    [ClassIdentifier("simplecomm/general/rs232")]
     public class SerialComm:ICommunication
     {
         private const int BUFFER_SIZE = 256;

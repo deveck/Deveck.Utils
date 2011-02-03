@@ -4,6 +4,8 @@ using System.Text;
 using Deveck.Utils.StringUtils;
 using System.Reflection;
 using Deveck.Utils.Factory;
+using Deveck.Utils.SimpleComm;
+using System.Threading;
 
 namespace Deveck.Utils.Samples
 {
@@ -13,8 +15,10 @@ namespace Deveck.Utils.Samples
 		
 		public static void Main(string[] args)
         {
-            Examples_SimpleFormatter();
-			Examples_ClassIdentifierFactory();
+			Example_SimpleComm_HID();
+			
+            //Examples_SimpleFormatter();
+			//Examples_ClassIdentifierFactory();
         }
 
 		#region SimpleFormatter examples
@@ -141,6 +145,23 @@ namespace Deveck.Utils.Samples
 		}
 		#endregion
 
+		
+		#region SimpleComm examples
+		/// <summary>
+		/// Shows how to use the HIDComm class to capture keyboard input 
+		/// </summary>
+		private static void Example_SimpleComm_HID()
+		{
+			ICommunication hidComm = 
+				GenericClassIdentifierFactory.CreateFromClassIdentifierOrType<ICommunication>("simplecomm/win/hid");
+			
+			hidComm.SetupCommunication(null);
+			
+			while(true)
+				Thread.Sleep(50);
+		}
+		
+		#endregion
 		
     }
 }
