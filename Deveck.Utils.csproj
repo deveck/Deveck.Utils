@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -32,8 +32,23 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\CollectionHelper.cs" />
+    <Compile Include="SimpleComm\ICommunication.cs" />
+    <Compile Include="SimpleComm\InputDevice.cs" />
+    <Compile Include="SimpleComm\NetworkComm.cs" />
+    <Compile Include="SimpleComm\PS2Comm.cs" />
+    <Compile Include="SimpleComm\SerialComm.cs" />
+    <Compile Include="Devices\Telecom\AnalogATZModem.cs" />
+    <Compile Include="Devices\Telecom\AnalogATZModemConfiguration.cs" />
+    <Compile Include="Devices\Telecom\CapiDevice.cs" />
+    <Compile Include="Devices\Telecom\CapiDeviceConfiguration.cs" />
+    <Compile Include="Devices\Telecom\ITelecom.cs" />
+    <Compile Include="Devices\Telecom\TelecomDeviceInfo.cs" />
+    <Compile Include="Devices\Telecom\TelecomManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringUtils\SimpleFormatter.cs" />
     <Compile Include="Factory\ClassIdentifierAttribute.cs" />
@@ -48,7 +63,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup>
-    <Folder Include="Factory\" />
-  </ItemGroup>
 </Project>
