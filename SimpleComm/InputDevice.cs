@@ -10,6 +10,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace Deveck.Utils.SimpleComm
 {
@@ -334,6 +335,20 @@ namespace Deveck.Utils.SimpleComm
         #endregion ReadReg( string item, ref bool isKeyboard )
 
         #region int EnumerateDevices()
+
+        public DeviceInfo[] Devices
+        {
+            get
+            {
+                List<DeviceInfo> deviceInfos = new List<DeviceInfo>();
+               
+
+                foreach (DeviceInfo d in deviceList.Values)
+                    deviceInfos.Add(d);
+
+                return deviceInfos.ToArray();
+            }
+        }
 
         /// <summary>
         /// Iterates through the list provided by GetRawInputDeviceList,

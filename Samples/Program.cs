@@ -6,23 +6,34 @@ using System.Reflection;
 using Deveck.Utils.Factory;
 using Deveck.Utils.SimpleComm;
 using System.Threading;
+using System.Windows.Forms;
+using System.Collections;
 
 namespace Deveck.Utils.Samples
 {
-    public class Program
+    public class Program:ApplicationContext
     {
    		static Random r = new Random();
 		
 		public static void Main(string[] args)
         {
-			Example_SimpleComm_HID();
-			
-            //Examples_SimpleFormatter();
-			//Examples_ClassIdentifierFactory();
+            Application.Run(new Program());
+        } 
+        
+        public Program()
+        {
+            Examples_SimpleFormatter();
+            Examples_ClassIdentifierFactory();
+
+            Example_SimpleComm_HID();
+            //Example_SimpleComm_RS232();
+            //Example_SimpleComm_Network();
+
+            
         }
 
 		#region SimpleFormatter examples
-		private static void Examples_SimpleFormatter()
+		private void Examples_SimpleFormatter()
 		{
 			Console.WriteLine(@"These samples show you how to use the SimpleFormatter from deveck.net");
             Console.WriteLine();
@@ -78,7 +89,7 @@ namespace Deveck.Utils.Samples
 		#endregion
 		
 		#region ClassIdentifier factory examples
-		private static void Examples_ClassIdentifierFactory()
+		private void Examples_ClassIdentifierFactory()
 		{
 		
 			Console.WriteLine(@"These samples show you how to use the ClassIdentifierFactory from deveck.net");
@@ -150,18 +161,159 @@ namespace Deveck.Utils.Samples
 		/// <summary>
 		/// Shows how to use the HIDComm class to capture keyboard input 
 		/// </summary>
-		private static void Example_SimpleComm_HID()
+		private void Example_SimpleComm_HID()
 		{
-			ICommunication hidComm = 
-				GenericClassIdentifierFactory.CreateFromClassIdentifierOrType<ICommunication>("simplecomm/win/hid");
-			
-			hidComm.SetupCommunication(null);
-			
-			while(true)
-				Thread.Sleep(50);
+            ICommunication hidComm =
+                GenericClassIdentifierFactory.CreateFromClassIdentifierOrType<ICommunication>("simplecomm/win/hid");
+
+            hidComm.SetupCommunication(null);
+
+            Console.WriteLine("Found {0}-HID devices:", ((HIDComm)hidComm).Devices.Length);
+            foreach (InputDevice.DeviceInfo dI in ((HIDComm)hidComm).Devices)
+                Console.WriteLine("Device: \n\tname={0} \n\tdescription={1}\n\ttype={2}", dI.deviceName, dI.Name, dI.deviceType);
+
+            Console.WriteLine("Setting up Catch-All HIDComm");
+            hidComm.OnDataReceived += (OnDataReceivedDelegate)delegate(byte[] data, int length)
+            {
+                Console.WriteLine("HIDComm [captureall]: {0}", Encoding.Default.GetString(data, 0, length));
+            };
+
+            Console.WriteLine("Setting up HIDComm for first HID: {0}", ((HIDComm)hidComm).Devices[0].deviceName);
+            Hashtable ht = new Hashtable();
+            ht.Add("lock_to", ((HIDComm)hidComm).Devices[0].deviceName);
+
+            ICommunication hidComm2 =
+                GenericClassIdentifierFactory.CreateFromClassIdentifierOrType<ICommunication>("simplecomm/win/hid");
+
+            hidComm2.SetupCommunication(ht);
+
+            hidComm2.OnDataReceived += (OnDataReceivedDelegate)delegate(byte[] data, int length)
+            {
+                Console.WriteLine("HIDComm2: {0}", Encoding.Default.GetString(data, 0, length));
+            };
 		}
-		
+
+        /// <summary>
+        /// Shows how to use the simplecomm/general/rs232
+        /// to simulate multiple, interconnected serial ports you can use http://com0com.sourceforge.net/
+        /// </summary>
+        private void Example_SimpleComm_RS232()
+        {
+            string portSrc = "COM7";
+            string portSink = "COM8";
+
+            IDictionary configSrc = new Hashtable();
+            configSrc.Add("port_name", portSrc);
+            configSrc.Add("baud_rate", 57600);
+
+            IDictionary configSink = new Hashtable();
+            configSink.Add("port_name", portSink);
+            configSink.Add("baud_rate", 57600);
+
+            ICommunication source = GenericClassIdentifierFactory.CreateFromClassIdentifierOrType<ICommunication>("simplecomm/general/rs232");
+
+            try
+            {
+                source.SetupCommunication(configSrc);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error setting up source port: {0}", portSrc);
+                return;
+            }
+
+
+            ICommunication sink = GenericClassIdentifierFactory.CreateFromClassIdentifierOrType<ICommunication>("simplecomm/general/rs232");
+
+            try
+            {
+                sink.SetupCommunication(configSink);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error setting up sink port: {0}", portSink);
+                return;
+            }
+
+            SimpleComm_Transfer(source, sink, "simplecomm/general/rs232");
+
+        }
+
+        /// <summary>
+        /// Shows how to use the simplecomm/general/tcp
+        /// </summary>
+        private void Example_SimpleComm_Network()
+        {
+            int port = 1234;
+            
+
+            IDictionary configListen = new Hashtable();
+            configListen.Add("port", port);
+            
+            IDictionary configConnect = new Hashtable();
+            configConnect.Add("remote_ip", "127.0.0.1");
+            configConnect.Add("port", port);
+            configConnect.Add("listen", false);
+
+            ICommunication source = GenericClassIdentifierFactory.CreateFromClassIdentifierOrType<ICommunication>("simplecomm/general/tcp");
+            source.SetupCommunication(configListen);
+
+            ICommunication sink = GenericClassIdentifierFactory.CreateFromClassIdentifierOrType<ICommunication>("simplecomm/general/tcp");
+            sink.SetupCommunication(configConnect);
+
+            SimpleComm_Transfer(source, sink, "simplecomm/general/tcp");
+        }
+
+        private void SimpleComm_Transfer(ICommunication source, ICommunication sink, string identifier)
+        {
+
+            AutoResetEvent syncSrc = new AutoResetEvent(false);
+            AutoResetEvent syncSink = new AutoResetEvent(false);
+
+            source.OnDataReceived += (OnDataReceivedDelegate)delegate(byte[] data, int length)
+            {
+                Console.WriteLine("{0} SOURCE received: {1}", identifier, Encoding.Default.GetString(data, 0, length));
+            };
+
+            sink.OnDataReceived += (OnDataReceivedDelegate)delegate(byte[] data, int length)
+            {
+                Console.WriteLine("{0} SINK received: {1}", identifier, Encoding.Default.GetString(data, 0, length));
+            };
+
+            //Src thread
+            ThreadPool.QueueUserWorkItem(
+                (WaitCallback)delegate(object state)
+                {
+                    for (int i = 0; i < 1000; i++)
+                    {
+                        byte[] b = Encoding.ASCII.GetBytes(string.Format("Hello from source: {0}", i));
+                        source.SendData(b, 0, b.Length);
+                        Thread.Sleep(20);
+                    }
+
+                    syncSrc.Set();
+                });
+
+            //Sink thread
+            ThreadPool.QueueUserWorkItem(
+                (WaitCallback)delegate(object state)
+                {
+                    for (int i = 0; i < 1000; i++)
+                    {
+                        byte[] b = Encoding.ASCII.GetBytes(string.Format("Hello from sink: {0}", i));
+                        sink.SendData(b, 0, b.Length);
+                        Thread.Sleep(30);
+                    }
+
+                    syncSink.Set();
+                });
+
+            syncSrc.WaitOne();
+            syncSink.WaitOne();
+        }
 		#endregion
+
+       
 		
     }
 }

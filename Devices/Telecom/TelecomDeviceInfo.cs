@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Wiffzack.Printing.Client;
 
 namespace Deveck.Utils.Devices.Telecom
 {

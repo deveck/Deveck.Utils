@@ -20,7 +20,7 @@ namespace Deveck.Utils.SimpleComm
     /// <item>local_ip [string, default:0.0.0.0]: specifies the local interface to listen on</item>
     /// <item>remote_ip [string, mandatory if in connection mode]: specifies the ip to connect to</item>
     /// <item>port [integer]: specifies the local port to listen on or the port to connect to</item>
-    /// <item>listen [0/1: default: 1]: specifies if this instance should listen for connection[1] or if it should connect to the remote host</item>
+    /// <item>listen [bool, default: true]: specifies if this instance should listen for connection[1] or if it should connect to the remote host</item>
     /// </list>
     /// </para>
     /// </remarks>
@@ -46,13 +46,13 @@ namespace Deveck.Utils.SimpleComm
         private void StartListener()
         {
             _listener = new TcpListener(IPAddress.Parse(CollectionHelper.ReadValue<string>(_config, "local_ip", "0.0.0.0")), 
-                CollectionHelper.ReadValue<int>(_config, "remote_ip"));
+                CollectionHelper.ReadValue<int>(_config, "port"));
             _listener.Start();
         }
 
 
         /// <summary>
-        /// Accepts the enxt incoming connection
+        /// Accepts the next incoming connection
         /// </summary>
         private void AcceptNextConnection()
         {

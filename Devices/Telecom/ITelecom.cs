@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using Deveck.Utils.SimpleComm;
+using System.Collections;
 
 namespace Deveck.Utils.Devices.Telecom
 {
@@ -23,7 +25,7 @@ namespace Deveck.Utils.Devices.Telecom
         /// </summary>
         /// <param name="comm"></param>
         /// <param name="config"></param>
-        void Initialize(ICommunication comm, XmlElement config, string endpoint);
+        void Initialize(ICommunication comm, IDictionary config, string endpoint);
 
     }
 }

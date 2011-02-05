@@ -1,63 +1,50 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Wiffzack.Communication;
 using System.Xml;
 using System.Threading;
-using Wiffzack.Diagnostic.Log;
-using Wiffzack.Printing.Client;
-using Wiffzack.Client.DisplayUnit.Telecom;
 using System.Windows.Forms;
+using Deveck.Utils.SimpleComm;
+using System.Collections;
 
 namespace Deveck.Utils.Devices.Telecom
 {
     /// <summary>
-    /// Implementiert das ITelecom Interface für Analoge Modems 
-    /// die den ATZ satz verstehen
+    /// Analog modem implementation of ITelecom
     /// </summary>
     public class AnalogATZModem:ITelecom
     {
         #region ITelecom Member
 
         /// <summary>
-        /// Wird aufgerufen wenn ein eingehender Anruf entdeckt wurde
-        /// und die Caller Informationen gesendet wurden
+        /// Gets raised on an incoming call
         /// </summary>
-        public event TelecomIncomingcallDelegate IncomingCall;
+        public event TelecomIncomingCallDelegate IncomingCall;
 
-        /// <summary>
-        /// Schnittstelle über die mit dem Modem kommuniziert wird
-        /// </summary>
         private ICommunication _comm = null;
 
         /// <summary>
-        /// Konfigurationsdaten
+        /// configuration data
         /// </summary>
-        private XmlElement _config = null;
+        private IDictionary _config = null;
 
-        /// <summary>
-        /// Empfangsbuffer
-        /// </summary>
+
         private StringBuilder _receiveBuffer = new StringBuilder();
 
         /// <summary>
-        /// Wird gesetzt wenn gerade ein Commando übertragen wird,
-        /// und darauf gewartet wird bis die statusmeldung eintrifft
+        /// Is set on command response receive
         /// </summary>
         private AutoResetEvent _transmittingCommand = new AutoResetEvent(false);
 
         /// <summary>
-        /// Irgendjemand wartet auf eine statusmeldung
+        /// Someone is waiting for status
         /// </summary>
         private volatile bool _waitingForStatus = false;
 
-        /// <summary>
-        /// Gibt an ob der letzte empfangene Status "OK" oder "ERROR" war
-        /// </summary>
         private volatile bool _lastStatusSuccessful = false;
 
         /// <summary>
-        /// Es wurde ein RING empfangen aber noch kein zugehöriges NMBR
+        /// RING but no NMBR
         /// </summary>
         private volatile bool _inRingStatus = false;
 
@@ -66,36 +53,24 @@ namespace Deveck.Utils.Devices.Telecom
         /// </summary>
         private AnalogATZModemConfiguration _modemConfiguration = null;
 
-        private string _endpoint = "";
-
-        /// <summary>
-        /// Logger
-        /// </summary>
-        private Logger _logger = LogManager.Global.GetLogger("Wiffzack.Logger");
-
         /// <summary>
         /// Initialisiert das Modem
         /// </summary>
         /// <param name="comm"></param>
         /// <param name="config"></param>
-        public void Initialize(ICommunication comm, XmlElement config, string endpoint)
+        public void Initialize(ICommunication comm, IDictionary config)
         {
             _comm = comm;
             _config = config;
-            _endpoint = endpoint;
-            _modemConfiguration = new AnalogATZModemConfiguration(config);
 
             _comm.OnDataReceived += new OnDataReceivedDelegate(_comm_OnDataReceived);
 
-            _logger.Info("Initialising Telecom Device '{0}'", endpoint);
 
             if (TransmitCommand("ATZ") == false ||
              TransmitCommand(_modemConfiguration.CommandInitializeCallerId) == false)
             {
-                _logger.Fatal("Initialization of Telecom Device '{0}' failed!", endpoint);
+                throw new Exception("Initialization of Telecom Device failed!");
             }
-            else
-                _logger.Info("Telecom Device '{0}' initialized", endpoint);
         }
 
         
@@ -113,7 +88,6 @@ namespace Deveck.Utils.Devices.Telecom
             lock (_receiveBuffer)
             {
                 string received = Encoding.ASCII.GetString(data, 0, length);
-                Console.WriteLine("Received: {0}", received);
                 _receiveBuffer.Append(received);
                 reinitialize = CheckBuffer();
             }
@@ -128,13 +102,12 @@ namespace Deveck.Utils.Devices.Telecom
 
         private void Reinitialize()
         {
-            //Manche Modems wollen jedes mal neu initialisiert werden
             bool result1 = TransmitCommand("ATZ");
             bool result2 = TransmitCommand(_modemConfiguration.CommandInitializeCallerId);
 
             if (result1 == false || result2 == false)
             {
-                _logger.Fatal("Reinitialization of modem device failed");
+                throw new Exception("Reinitialization of modem device failed");
             }
         }
 
@@ -201,7 +174,7 @@ namespace Deveck.Utils.Devices.Telecom
         }
 
         /// <summary>
-        /// 
+        /// Transmit command and wait for response
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>

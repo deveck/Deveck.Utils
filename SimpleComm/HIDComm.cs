@@ -7,6 +7,7 @@ using System.Diagnostics;
 
 using Deveck.Utils.Factory;
 using System.Collections;
+using Deveck.Utils.Collections;
 
 namespace Deveck.Utils.SimpleComm
 {
@@ -14,17 +15,20 @@ namespace Deveck.Utils.SimpleComm
     /// SimpleComm HID (Human Interface Device) (keyboard input) implementation
     /// </summary>
     /// <remarks>
-    /// <para>Configuration:
-    /// No configuration values are needed
+    /// <para>
+    /// Configuration:
+    /// lock_to [string, default: ""]: Locks the HIDComm to certain keyboard
     /// </para>
     /// </remarks>
     [ClassIdentifier("simplecomm/win/hid")]
     public class HIDComm : NativeWindow, ICommunication
     {
+
         /// <summary>
-        /// RawInput handler
+        /// RawInput handler 
+        /// It's static because only a single RawInput handler is supported per application
         /// </summary>
-        private InputDevice _inputDevice = null;
+        private static InputDevice _inputDevice = null;
 
         /// <summary>
         /// lokaler buffer
@@ -38,6 +42,7 @@ namespace Deveck.Utils.SimpleComm
         /// </summary>
         private bool _isAsciiKeyPressed = false;
 
+        private IDictionary _config = null;
 
         [DllImport("user32")]
         private static extern int ToAscii(
@@ -78,9 +83,21 @@ namespace Deveck.Utils.SimpleComm
 #pragma warning restore 067
 
         public void SetupCommunication(IDictionary setup)
-        {            
-            _inputDevice = new InputDevice(this.Handle);
-            _inputDevice.EnumerateDevices();
+        {
+            _config = setup;
+
+            if (_config == null)
+                _config = new Hashtable();
+
+            lock (typeof(HIDComm))
+            {
+                if (_inputDevice == null)
+                {
+                    _inputDevice = new InputDevice(this.Handle);
+                    _inputDevice.EnumerateDevices();
+                }
+            }
+
             _inputDevice.KeyDown += new InputDevice.DeviceEventHandler(InternalOnRawKeyPress);
             _inputDevice.KeyUp += new InputDevice.DeviceEventHandler(InternalOnRawKeyReleased);
         }
@@ -111,6 +128,10 @@ namespace Deveck.Utils.SimpleComm
             Debug.WriteLine(string.Format("PRESS[{0}]: {1}", e.Keyboard.deviceName,
 			                              ((Keys)e.Keyboard.key).ToString()));
 
+            string lockTo = CollectionHelper.ReadValue<string>(_config, "lock_to", null);
+            if (lockTo != null && e.Keyboard.deviceName != lockTo)
+                return;
+
             if ((Keys)e.Keyboard.key == Keys.Menu)
             {
 
@@ -124,7 +145,12 @@ namespace Deveck.Utils.SimpleComm
 
         private void InternalOnRawKeyReleased(object sender, InputDevice.KeyControlEventArgs e)
         {
-             Debug.WriteLine("RELEASE: " + ((Keys)e.Keyboard.key).ToString());
+            Debug.WriteLine("RELEASE: " + ((Keys)e.Keyboard.key).ToString());
+
+            string lockTo = CollectionHelper.ReadValue<string>(_config, "lock_to", null);
+            if (lockTo != null && e.Keyboard.deviceName != lockTo)
+                return;
+
             lock (_buffer)
             {
                 Keys myKey = (Keys)e.Keyboard.key;
@@ -196,6 +222,12 @@ namespace Deveck.Utils.SimpleComm
         }
 
         #endregion
+
+        public InputDevice.DeviceInfo[] Devices
+        {
+            get { return _inputDevice.Devices; }
+        }
+
 
         #region IDisposable Members
 
