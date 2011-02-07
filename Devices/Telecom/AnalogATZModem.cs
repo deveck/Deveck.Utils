@@ -6,12 +6,25 @@ using System.Threading;
 using System.Windows.Forms;
 using Deveck.Utils.SimpleComm;
 using System.Collections;
+using Deveck.Utils.Factory;
 
 namespace Deveck.Utils.Devices.Telecom
 {
     /// <summary>
     /// Analog modem implementation of ITelecom
     /// </summary>
+    /// <remarks>
+    /// Configuration values with default values:
+    /// 
+    ///  Ring = "RING";
+    ///  ConfirmOk = "OK";
+    ///  ConfirmError = "ERROR";
+    ///  CommandInitializeCallerId = "AT#CID=1";
+    ///  InfoNumberField = "NMBR";
+    ///  InfoSuppressedCallerId = "OUT OF ORDER";
+    ///  TransmitCommandTimeout = 1000;
+    /// </remarks>
+    [ClassIdentifier("telecom/general/atz")]
     public class AnalogATZModem:ITelecom
     {
         #region ITelecom Member
@@ -49,12 +62,12 @@ namespace Deveck.Utils.Devices.Telecom
         private volatile bool _inRingStatus = false;
 
         /// <summary>
-        /// Derzeitige Konfiguration in geparster form
+        /// Parsed modem configuration
         /// </summary>
         private AnalogATZModemConfiguration _modemConfiguration = null;
 
         /// <summary>
-        /// Initialisiert das Modem
+        /// Initializes the modem
         /// </summary>
         /// <param name="comm"></param>
         /// <param name="config"></param>
@@ -62,6 +75,7 @@ namespace Deveck.Utils.Devices.Telecom
         {
             _comm = comm;
             _config = config;
+            _modemConfiguration = new AnalogATZModemConfiguration(config);
 
             _comm.OnDataReceived += new OnDataReceivedDelegate(_comm_OnDataReceived);
 
@@ -78,7 +92,7 @@ namespace Deveck.Utils.Devices.Telecom
         #endregion
         
         /// <summary>
-        /// Es wurden Daten vom Modem empfangen
+        /// Data received from modem
         /// </summary>
         /// <param name="data"></param>
         /// <param name="length"></param>
@@ -112,7 +126,7 @@ namespace Deveck.Utils.Devices.Telecom
         }
 
         /// <summary>
-        /// Überprüft den Buffer auf gültige sequenzen
+        /// Checks the buffer for valid sequences
         /// </summary>
         private bool CheckBuffer()
         {

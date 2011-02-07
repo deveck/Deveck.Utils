@@ -1,52 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Wiffzack.Telecom;
-using Wiffzack.Communication;
 using System.Xml;
 using Mommosoft.Capi;
-using Wiffzack.Diagnostic.Log;
-using Wiffzack.Printing.Client;
+using Deveck.Utils.Factory;
+using System.Diagnostics;
+using Deveck.Utils.SimpleComm;
+using System.Collections;
 
 namespace Deveck.Utils.Devices.Telecom
 {
     /// <summary>
-    /// Implementiert das ITelecom interface für CAPI (ISDN) Geräte
+    /// Implements the ITelecom interface for CAPI devices
     /// </summary>
     /// <remarks>
-    /// Standardmäßig versucht diese Implementation bei allen gefundenen CAPI geräten zuzuhören,
-    /// es werden keine Anrufe entgegen genommen und sollten somit den Gesamtbetrieb nicht beeinflussen
+    /// this implementation listens on all attached capi devices, but
+    /// does not answer any calls, so the operation should not be affected in any way
+    /// 
+    /// Thanks go out to http://capi.codeplex.com/ for its great CAPI.NET library
     /// </remarks>
+    [ClassIdentifier("telecom/win/capi")]
     public class CapiDevice : ITelecom
     {
         /// <summary>
-        /// Interface zu CAPI
+        /// Capi Interface
         /// </summary>
         private CapiApplication _capiApplication;
 
         /// <summary>
-        /// Konfiguration des CAPIDevice
+        /// Configuration of the capi device
         /// </summary>
         private CapiDeviceConfiguration _configuration;
 
-        /// <summary>
-        /// Entpunkt um Logeinträge lesbarer zu machen
-        /// </summary>
-        private string _endpoint;
-
-        /// <summary>
-        /// Logger
-        /// </summary>
-        private Logger _logger = LogManager.Global.GetLogger("CapiDevice");
-
         #region ITelecom Members
 
-        public event TelecomIncomingcallDelegate IncomingCall;
+        public event TelecomIncomingCallDelegate IncomingCall;
 
-        public void Initialize(ICommunication comm, XmlElement config, string endpoint)
+        public void Initialize(ICommunication comm, IDictionary config)
         {
             _configuration = new CapiDeviceConfiguration(config);
-            _endpoint = endpoint;
 
             try
             {
@@ -112,17 +104,17 @@ namespace Deveck.Utils.Devices.Telecom
 
         private void LogInfoEntry(string format, params object[] arguments)
         {
-            _logger.Info(_endpoint + ": " + format, arguments);
+            Debug.WriteLine(string.Format("INFO: " + format, arguments));
         }
 
         private void LogWarnEntry(string format, params object[] arguments)
         {
-            _logger.Warning(_endpoint + ": " + format, arguments);
+            Debug.WriteLine(string.Format("WARN: " + format, arguments));
         }
 
         private void LogErrorEntry(string format, params object[] arguments)
         {
-            _logger.Fatal(_endpoint + ": " + format, arguments);
+            Debug.WriteLine(string.Format("ERROR: " + format, arguments));
         }
     }
 }

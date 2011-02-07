@@ -16,16 +16,16 @@ namespace Deveck.Utils.Devices.Telecom
     public interface ITelecom:IDisposable
     {
         /// <summary>
-        /// Ein eingehender Anruf wurde endeckt
+        /// Incoming call detected
         /// </summary>
         event TelecomIncomingCallDelegate IncomingCall;
 
         /// <summary>
-        /// Initialisiert und startet den Provider
+        /// Initialize the incoming-call-provider
         /// </summary>
         /// <param name="comm"></param>
         /// <param name="config"></param>
-        void Initialize(ICommunication comm, IDictionary config, string endpoint);
+        void Initialize(ICommunication comm, IDictionary config);
 
     }
 }

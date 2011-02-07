@@ -31,6 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Mommosoft.Capi, Version=0.8.0.0, Culture=neutral, PublicKeyToken=a118293b9ec39e22, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\Mommosoft.Capi.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -51,9 +55,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Devices\Telecom\ITelecom.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Devices\Telecom\TelecomDeviceInfo.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Devices\Telecom\TelecomIncomingInfo.cs" />

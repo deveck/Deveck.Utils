@@ -8,6 +8,7 @@ using Deveck.Utils.SimpleComm;
 using System.Threading;
 using System.Windows.Forms;
 using System.Collections;
+using Deveck.Utils.Devices.Telecom;
 
 namespace Deveck.Utils.Samples
 {
@@ -22,13 +23,16 @@ namespace Deveck.Utils.Samples
         
         public Program()
         {
-            Examples_SimpleFormatter();
-            Examples_ClassIdentifierFactory();
+            throw new Exception("No Example has been selected! Comment out this line of code and comment in one or more Examples");
+            //Examples_SimpleFormatter();
+            //Examples_ClassIdentifierFactory();
 
-            Example_SimpleComm_HID();
+            //Example_SimpleComm_HID();
             //Example_SimpleComm_RS232();
             //Example_SimpleComm_Network();
 
+            //Example_Telecom_ATZ();
+            //Example_Telecom_Capi();
             
         }
 
@@ -313,7 +317,44 @@ namespace Deveck.Utils.Samples
         }
 		#endregion
 
-       
-		
+
+        #region Telecom examples
+        /// <summary>
+        /// Tests the AnalogATZModem provider (implements ITelecom)
+        /// </summary>
+        private void Example_Telecom_ATZ()
+        {
+            ICommunication serialComm = GenericClassIdentifierFactory.CreateFromClassIdentifierOrType<ICommunication>("simplecomm/general/rs232");
+            IDictionary config = new Hashtable();
+            config.Add("port_name", "COM8");
+            config.Add("baud_rate", 57600);
+            serialComm.SetupCommunication(config);
+
+            ITelecom t = GenericClassIdentifierFactory.CreateFromClassIdentifierOrType<ITelecom>("telecom/general/atz");
+            t.IncomingCall += new TelecomIncomingCallDelegate(_IncomingCall);
+
+            //Initialize the incoming-call provider with its default parameters
+            IDictionary modemConfig = new Hashtable();
+            modemConfig.Add("TransmitCommandTimeout", 5000);
+            t.Initialize(serialComm, modemConfig);
+
+        }
+
+         /// <summary>
+        /// Tests the AnalogATZModem provider (implements ITelecom)
+        /// </summary>
+        private void Example_Telecom_Capi()
+        {
+            ITelecom t = GenericClassIdentifierFactory.CreateFromClassIdentifierOrType<ITelecom>("telecom/win/capi");
+            t.IncomingCall += new TelecomIncomingCallDelegate(_IncomingCall);
+            t.Initialize(null, new Hashtable());
+        }
+
+        private void _IncomingCall(ITelecom sender, TelecomIncomingInfo info)
+        {
+            Console.WriteLine("Incoming Call from '{0}' detected", info.Identifier);
+        }
+        #endregion
+
     }
 }
