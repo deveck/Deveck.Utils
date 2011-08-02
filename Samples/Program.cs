@@ -23,7 +23,7 @@ namespace Deveck.Utils.Samples
         
         public Program()
         {
-            throw new Exception("No Example has been selected! Comment out this line of code and comment in one or more Examples");
+            //throw new Exception("No Example has been selected! Comment out this line of code and comment in one or more Examples");
             //Examples_SimpleFormatter();
             //Examples_ClassIdentifierFactory();
 
@@ -33,6 +33,8 @@ namespace Deveck.Utils.Samples
 
             //Example_Telecom_ATZ();
             //Example_Telecom_Capi();
+
+            Example_ScrollbarTest();
             
         }
 
@@ -353,6 +355,14 @@ namespace Deveck.Utils.Samples
         private void _IncomingCall(ITelecom sender, TelecomIncomingInfo info)
         {
             Console.WriteLine("Incoming Call from '{0}' detected", info.Identifier);
+        }
+        #endregion
+
+        #region Ui Tests
+        private static void Example_ScrollbarTest()
+        {
+            ScrollbarTestForm testForm = new ScrollbarTestForm();
+            testForm.ShowDialog();
         }
         #endregion
 

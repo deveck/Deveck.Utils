@@ -41,12 +41,23 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScrollbarTestForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ScrollbarTestForm.Designer.cs">
+      <DependentUpon>ScrollbarTestForm.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Deveck.Utils.csproj">
       <Project>{3EFB3EB6-A5B3-4BDD-AAEB-518273242D64}</Project>
       <Name>Deveck.Utils</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ScrollbarTestForm.resx">
+      <DependentUpon>ScrollbarTestForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
