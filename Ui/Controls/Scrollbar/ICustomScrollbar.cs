@@ -6,11 +6,6 @@ namespace Deveck.Ui.Controls.Scrollbar
 {
     public delegate void ScrollValueChangedDelegate(ICustomScrollbar sender, int newValue);
 
-    /// <summary>
-    /// Interface dass von Scrollbar implementationen Implementiert werden muss,
-    /// zusätzlich muss die Klasse von Control abgeleitet sein, was mit Hilfe
-    /// des Interfaces nicht erzwungen werden kann
-    /// </summary>
     public interface ICustomScrollbar
     {
         event ScrollValueChangedDelegate ValueChanged;

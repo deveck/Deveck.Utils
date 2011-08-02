@@ -6,7 +6,7 @@ using System.Drawing;
 namespace Deveck.Ui.Painters
 {
     /// <summary>
-    /// Ruft mehrere Painter hintereinander aus
+    /// Chain painters. They get called in the same order than they are added
     /// </summary>
     public class StackedPainters : Painter
     {

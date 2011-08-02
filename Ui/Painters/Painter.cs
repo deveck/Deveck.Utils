@@ -62,7 +62,7 @@ namespace Deveck.Ui.Painters
                    position.Height - 4);
             else
             {
-                //Es gibt ein Bildchen, aus der maximalen Bildhöhe soll die Breite des Bildchens berechnet werden
+                //There is an image, calculate the the width from te max height
                 int imageHeight = position.Height - 10;
 
                 double imageRatio = (double)buttonImage.Width / (double)buttonImage.Height;
@@ -84,7 +84,6 @@ namespace Deveck.Ui.Painters
             if (referencePosition != null)
             {
 
-                //Ratio berechnen
                 double xRatio = (double)position.Width / (double)referencePosition.Value.Width;
                 double yRatio = (double)position.Height / (double)referencePosition.Value.Height;
                 textFont = ScaledFont(textFont, xRatio, yRatio, text, textBounds, g, format);
@@ -103,11 +102,11 @@ namespace Deveck.Ui.Painters
 
         protected Font ScaledFont(Font referenceFont, double xRatio, double yRatio, string text, Rectangle fitTo, Graphics g, StringFormat format)
         {
-            //Zuerst die skalierten fonts anhand der y Skalierung berechnen
+            //Calculate scaled fonts based on the y-scale-factor
             float fontsize_YScaled = Math.Max(1, (int)(referenceFont.Size * yRatio));
 
             Font newFont = new Font(referenceFont.FontFamily, fontsize_YScaled, referenceFont.Style);
-            //Überprüfen ob der gezeichnete Text (mit y skaliertem Font) passt
+            //Check if text with y-scaled font fits
             SizeF textSize = g.MeasureString(text, newFont, fitTo.Width, format);
 
             if (textSize.Height <= fitTo.Height)
@@ -124,7 +123,7 @@ namespace Deveck.Ui.Painters
 
                     fontsize_YScaled -= 0.5f;
                     newFont = new Font(referenceFont.FontFamily, fontsize_YScaled, referenceFont.Style);
-                    //Überprüfen ob der gezeichnete Text (mit y skaliertem Font) passt
+                    //And check again
                     textSize = g.MeasureString(text, newFont, fitTo.Width);
 
                     if (textSize.Height <= fitTo.Height)

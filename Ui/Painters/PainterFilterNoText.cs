@@ -6,7 +6,7 @@ using System.Drawing;
 namespace Deveck.Ui.Painters
 {
     /// <summary>
-    /// Filtert für den assoziierten Painter den Text weg
+    /// PAsses no text to the associated painter
     /// </summary>
     public class PainterFilterNoText : Painter
     {

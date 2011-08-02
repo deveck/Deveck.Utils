@@ -57,7 +57,7 @@ namespace Deveck.Ui.Painters
             double layoutRatio = (double)layoutArea.Width / (double)layoutArea.Height;
 
             Rectangle targetRect;
-            //Breite maximieren
+            //maximize width
             if (layoutRatio < _targetRatio)
             {   
                 int targetWidth = layoutArea.Width;
@@ -71,7 +71,7 @@ namespace Deveck.Ui.Painters
 
                 
             }
-            //Höhe maximieren
+            //maximize height
             else
             {
                 int targetWidth = (int)((double)layoutArea.Height * _targetRatio);

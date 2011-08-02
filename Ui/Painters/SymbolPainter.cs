@@ -17,19 +17,8 @@ namespace Deveck.Ui.Painters
 
         public enum SymbolEnum
         {
-            /// <summary>
-            /// Zeichnet ein Dreieck dass nach unten ausgefüllt ist
-            /// </summary>
             TriangleDown,
-
-            /// <summary>
-            /// Zeichnet ein Dreieck nach oben
-            /// </summary>
             TriangleUp,
-
-            /// <summary>
-            /// Zeichnet 3 horizontale Linien "Grip" zum anpacken mit der Maus
-            /// </summary>
             GripH
         }
 
